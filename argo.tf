@@ -18,6 +18,8 @@ resource "helm_release" "argocd" {
     server:
       service:
         type: LoadBalancer
+        loadBalancerSourceRanges:
+          - ${var.admin_cidr}
     configs:
       params:
         server.insecure: true

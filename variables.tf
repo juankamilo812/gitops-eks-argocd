@@ -69,3 +69,9 @@ variable "enable_argocd_bootstrap" {
   type        = bool
   default     = false
 }
+
+variable "admin_cidr" {
+  description = "CIDR permitido para acceso SSH a nodos y comunicación de administración (tu IP pública)."
+  type        = string
+  default     = "201.233.190.31/32"
+}
