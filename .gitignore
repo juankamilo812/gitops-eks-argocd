@@ -1,0 +1,18 @@
+# Terraform working directory (providers, modules cache)
+.terraform/
+
+# State files (sensitive, large, not needed in VCS)
+terraform.tfstate
+terraform.tfstate.*
+crash.log
+crash.*.log
+*.tfstate.backup
+
+# Local variable overrides / secrets
+*.tfvars
+*.tfvars.json
+
+# OS / editor noise
+.DS_Store
+*.swp
+*.swo
