@@ -32,11 +32,6 @@ module "eks" {
 
       instance_types = ["t3.medium"]
       disk_size      = 20
-
-      tags = {
-        "k8s.io/cluster-autoscaler/enabled"             = "true"
-        "k8s.io/cluster-autoscaler/${var.cluster_name}" = "owned"
-      }
     }
   }
 

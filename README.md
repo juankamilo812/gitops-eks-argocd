@@ -6,11 +6,10 @@ Terraform para desplegar en AWS: VPC, EKS, Argo CD y una aplicación de muestra 
 - AWS SSO iniciado: `aws sso login --profile vop-dev`
 - Terraform >= 1.5
 - kubectl y awscli configurados con el perfil `vop-dev`
-- Conectividad a la VPC (VPN/Direct Connect/bastión) para acceder al endpoint privado del clúster y a servicios internos (Argo CD).
+- Acceso desde tu IP incluida en `admin_cidr` (para el endpoint público del clúster) o conectividad a la VPC (VPN/Direct Connect/bastión) para servicios internos como Argo CD.
 
 ## Estructura
 - `main.tf`, `vpc.tf`, `eks.tf`, `argo.tf`, `variables.tf`, `outputs.tf`: Infraestructura y Argo CD.
-- `cluster_autoscaler.tf`: IAM + Helm para Cluster Autoscaler.
 - `apps/sample-app/`: Manifiestos que Argo CD sincroniza al clúster.
 
 ## Despliegue
@@ -23,11 +22,6 @@ Terraform para desplegar en AWS: VPC, EKS, Argo CD y una aplicación de muestra 
 6) Instalar Argo CD + app de ejemplo (requiere conectividad privada al clúster):  
    `terraform plan  -var enable_argocd_bootstrap=true`  
    `terraform apply -var enable_argocd_bootstrap=true`
-
-## Cluster Autoscaler
-- Instalado vía Helm por defecto en `kube-system` y con IRSA dedicada.
-- Node group ajustado a `min_size=1`, `desired_size=1`, `max_size=2` y etiquetado para auto-discovery.
-- Necesitas conectividad al endpoint privado del clúster para que `terraform plan/apply` pueda contactar al API y desplegar el release.
 
 ## Acceso al clúster
 Configurar kubeconfig después de aplicar:
@@ -66,6 +60,6 @@ Se pueden ajustar en `terraform.tfvars` o vía `-var`:
 
 ## Cambios de privacidad y endpoints
 - Se usa NAT Gateway (1 por defecto) para permitir salida a Internet desde subredes privadas.
-- El endpoint del clúster EKS sigue siendo solo privado. Necesitas conectarte desde la red interna (VPN/Direct Connect/bastión) para `kubectl` o Helm.
+- El endpoint del clúster EKS está habilitado de forma privada y también público restringido a `admin_cidr`; ajusta ese CIDR a tu IP antes de aplicar.
 - Argo CD expone un LoadBalancer externo pero restringido por `loadBalancerSourceRanges` al `admin_cidr` para UI/API.
 - Para limitar la exposición, puedes añadir endpoints VPC si quieres reducir tráfico vía NAT y ajustar egress rules según tus necesidades.
