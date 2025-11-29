@@ -75,3 +75,9 @@ variable "admin_cidr" {
   type        = string
   default     = "201.233.190.31/32"
 }
+
+variable "admin_iam_principal_arn" {
+  description = "ARN del rol o usuario IAM que tendrá acceso admin al API de Kubernetes (EKS access entry)."
+  type        = string
+  default     = ""
+}

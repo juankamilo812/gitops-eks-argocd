@@ -39,4 +39,18 @@ module "eks" {
       }
     }
   }
+
+  access_entries = var.admin_iam_principal_arn != "" ? {
+    admin = {
+      principal_arn = var.admin_iam_principal_arn
+      policy_associations = [
+        {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "*"
+          }
+        }
+      ]
+    }
+  } : {}
 }

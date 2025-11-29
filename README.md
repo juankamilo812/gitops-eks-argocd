@@ -62,6 +62,7 @@ Se pueden ajustar en `terraform.tfvars` o vía `-var`:
 - CIDRs para VPC y subredes públicas/privadas
 - `enable_argocd_bootstrap` (por defecto `false`): instala Argo CD + app de ejemplo cuando se pone en `true`. Mantener en `false` para que `terraform plan` funcione sin kubeconfig en el primer despliegue.
 - `admin_cidr` (por defecto `201.233.190.31/32`): único origen permitido para SSH a los nodos.
+- `admin_iam_principal_arn` (vacío por defecto): ARN de rol/usuario IAM al que se le otorga acceso admin al API de Kubernetes vía EKS Access Entry. Ej.: `arn:aws:iam::<account>:role/<tu-rol-sso>`.
 
 ## Cambios de privacidad y endpoints
 - Se usa NAT Gateway (1 por defecto) para permitir salida a Internet desde subredes privadas.
