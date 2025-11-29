@@ -23,23 +23,6 @@ resource "helm_release" "argocd" {
     configs:
       params:
         server.insecure: true
-    additionalApplications:
-      - name: ${var.name_prefix}-sample-app
-        namespace: argocd
-        project: default
-        source:
-          repoURL: ${var.git_repo_url}
-          targetRevision: ${var.git_repo_revision}
-          path: apps/sample-app
-        destination:
-          server: https://kubernetes.default.svc
-          namespace: ${var.sample_app_namespace}
-        syncPolicy:
-          automated:
-            prune: true
-            selfHeal: true
-          syncOptions:
-            - CreateNamespace=true
     YAML
   ]
 
@@ -55,4 +38,50 @@ data "kubernetes_service" "argocd_server" {
   }
 
   depends_on = [helm_release.argocd]
+}
+
+resource "kubernetes_namespace" "sample_app" {
+  count = local.bootstrap_argocd ? 1 : 0
+
+  metadata {
+    name = var.sample_app_namespace
+  }
+
+  depends_on = [helm_release.argocd]
+}
+
+resource "kubernetes_manifest" "sample_app" {
+  count = local.bootstrap_argocd ? 1 : 0
+
+  manifest = {
+    "apiVersion" = "argoproj.io/v1alpha1"
+    "kind"       = "Application"
+    "metadata" = {
+      "name"      = "${var.name_prefix}-sample-app"
+      "namespace" = helm_release.argocd[0].namespace
+    }
+    "spec" = {
+      "project" = "default"
+      "source" = {
+        "repoURL"        = var.git_repo_url
+        "targetRevision" = var.git_repo_revision
+        "path"           = "apps/sample-app"
+      }
+      "destination" = {
+        "server"    = "https://kubernetes.default.svc"
+        "namespace" = var.sample_app_namespace
+      }
+      "syncPolicy" = {
+        "automated" = {
+          "prune"    = true
+          "selfHeal" = true
+        }
+        "syncOptions" = [
+          "CreateNamespace=true"
+        ]
+      }
+    }
+  }
+
+  depends_on = [helm_release.argocd, kubernetes_namespace.sample_app]
 }
