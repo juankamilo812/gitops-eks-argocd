@@ -10,6 +10,7 @@ Terraform para desplegar en AWS: VPC, EKS, Argo CD y una aplicación de muestra 
 
 ## Estructura
 - `main.tf`, `vpc.tf`, `eks.tf`, `argo.tf`, `variables.tf`, `outputs.tf`: Infraestructura y Argo CD.
+- `cluster_autoscaler.tf`: IAM + Helm para Cluster Autoscaler.
 - `apps/sample-app/`: Manifiestos que Argo CD sincroniza al clúster.
 
 ## Despliegue
@@ -22,6 +23,11 @@ Terraform para desplegar en AWS: VPC, EKS, Argo CD y una aplicación de muestra 
 6) Instalar Argo CD + app de ejemplo (requiere conectividad privada al clúster):  
    `terraform plan  -var enable_argocd_bootstrap=true`  
    `terraform apply -var enable_argocd_bootstrap=true`
+
+## Cluster Autoscaler
+- Instalado vía Helm por defecto en `kube-system` y con IRSA dedicada.
+- Node group ajustado a `min_size=1`, `desired_size=1`, `max_size=2` y etiquetado para auto-discovery.
+- Necesitas conectividad al endpoint privado del clúster para que `terraform plan/apply` pueda contactar al API y desplegar el release.
 
 ## Acceso al clúster
 Configurar kubeconfig después de aplicar:
