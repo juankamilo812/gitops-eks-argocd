@@ -55,50 +55,50 @@ resource "aws_iam_role_policy" "cluster_autoscaler" {
   policy = data.aws_iam_policy_document.cluster_autoscaler.json
 }
 
-# resource "helm_release" "cluster_autoscaler" {
-#   name       = "cluster-autoscaler"
-#   repository = "https://kubernetes.github.io/autoscaler"
-#   chart      = "cluster-autoscaler"
-#   version    = "9.37.0"
-#
-#   namespace = "kube-system"
-#
-#   values = [
-#     <<-YAML
-#     autoDiscovery:
-#       clusterName: ${var.cluster_name}
-#     awsRegion: ${var.region}
-#     rbac:
-#       serviceAccount:
-#         create: true
-#         name: cluster-autoscaler
-#         annotations:
-#           eks.amazonaws.com/role-arn: ${aws_iam_role.cluster_autoscaler.arn}
-#     extraArgs:
-#       skip-nodes-with-local-storage: false
-#       scan-interval: 10s
-#       balance-similar-node-groups: true
-#       skip-nodes-with-system-pods: false
-#     tolerations:
-#       - effect: NoSchedule
-#         key: node-role.kubernetes.io/control-plane
-#         operator: Exists
-#       - key: CriticalAddonsOnly
-#         operator: Exists
-#     affinity:
-#       podAntiAffinity:
-#         preferredDuringSchedulingIgnoredDuringExecution:
-#           - weight: 100
-#             podAffinityTerm:
-#               labelSelector:
-#                 matchExpressions:
-#                   - key: app.kubernetes.io/name
-#                     operator: In
-#                     values:
-#                       - cluster-autoscaler
-#               topologyKey: kubernetes.io/hostname
-#     YAML
-#   ]
-#
-#   depends_on = [module.eks, aws_iam_role_policy.cluster_autoscaler]
-# }
+resource "helm_release" "cluster_autoscaler" {
+  name       = "cluster-autoscaler"
+  repository = "https://kubernetes.github.io/autoscaler"
+  chart      = "cluster-autoscaler"
+  version    = "9.37.0"
+
+  namespace = "kube-system"
+
+  values = [
+    <<-YAML
+    autoDiscovery:
+      clusterName: ${var.cluster_name}
+    awsRegion: ${var.region}
+    rbac:
+      serviceAccount:
+        create: true
+        name: cluster-autoscaler
+        annotations:
+          eks.amazonaws.com/role-arn: ${aws_iam_role.cluster_autoscaler.arn}
+    extraArgs:
+      skip-nodes-with-local-storage: false
+      scan-interval: 10s
+      balance-similar-node-groups: true
+      skip-nodes-with-system-pods: false
+    tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists
+      - key: CriticalAddonsOnly
+        operator: Exists
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - cluster-autoscaler
+              topologyKey: kubernetes.io/hostname
+    YAML
+  ]
+
+  depends_on = [module.eks, aws_iam_role_policy.cluster_autoscaler]
+}
