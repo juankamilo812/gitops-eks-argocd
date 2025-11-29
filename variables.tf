@@ -79,5 +79,5 @@ variable "admin_cidr" {
 variable "admin_iam_principal_arn" {
   description = "ARN del rol o usuario IAM que tendrá acceso admin al API de Kubernetes (EKS access entry)."
   type        = string
-  default     = ""
+  default     = "arn:aws:iam::412381767274:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_GFTAdministratorAccess_142b237aadf1415b"
 }
