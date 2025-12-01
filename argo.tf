@@ -15,6 +15,9 @@ resource "helm_release" "argocd" {
 
   values = [
     <<-YAML
+    installCRDs: true
+    applicationSet:
+      enabled: true
     server:
       service:
         type: LoadBalancer
