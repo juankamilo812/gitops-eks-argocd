@@ -44,10 +44,10 @@ resource "helm_release" "argocd" {
               source:
                 repoURL: ${var.git_repo_url}
                 targetRevision: ${var.git_repo_revision}
-                path: '{{path}}'
+                path: '{{`{{path}}`}}'
               destination:
                 server: https://kubernetes.default.svc
-                namespace: '{{path.basename}}'
+                namespace: '{{`{{path.basename}}`}}'
               syncPolicy:
                 automated:
                   prune: true
