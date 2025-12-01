@@ -18,6 +18,7 @@ resource "helm_release" "argocd" {
     installCRDs: true
     applicationSet:
       enabled: true
+      installCRDs: true
     server:
       service:
         type: LoadBalancer
