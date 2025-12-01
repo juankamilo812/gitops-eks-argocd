@@ -73,3 +73,59 @@ data "kubernetes_service" "argocd_server" {
 
   depends_on = [helm_release.argocd]
 }
+
+resource "kubernetes_manifest" "applicationset_apps" {
+  count = local.bootstrap_argocd ? 1 : 0
+
+  manifest = {
+    apiVersion = "argoproj.io/v1alpha1"
+    kind       = "ApplicationSet"
+    metadata = {
+      name      = "${var.name_prefix}-apps"
+      namespace = helm_release.argocd[0].namespace
+    }
+    spec = {
+      generators = [
+        {
+          git = {
+            repoURL  = var.git_repo_url
+            revision = var.git_repo_revision
+            directories = [
+              {
+                path = "apps/*"
+              }
+            ]
+          }
+        }
+      ]
+      template = {
+        metadata = {
+          name = "{{path.basename}}"
+        }
+        spec = {
+          project = "default"
+          source = {
+            repoURL        = var.git_repo_url
+            targetRevision = var.git_repo_revision
+            path           = "{{path}}"
+          }
+          destination = {
+            server    = "https://kubernetes.default.svc"
+            namespace = "{{path.basename}}"
+          }
+          syncPolicy = {
+            automated = {
+              prune    = true
+              selfHeal = true
+            }
+            syncOptions = [
+              "CreateNamespace=true"
+            ]
+          }
+        }
+      }
+    }
+  }
+
+  depends_on = [helm_release.argocd]
+}
